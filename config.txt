@@ -1,0 +1,49 @@
+
+# Jump into sudo
+sudo su
+
+# Activate Venv
+## Jump into folder with venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Runs gunicorn
+gunicorn --workers 3 --bind 127.0.0.1:5000 wsgi:app
+
+## This one runes gunicorn headless 
+gunicorn --workers 3 --bind 127.0.0.1:5000 wsgi:app --daemon
+
+## This stops gunicorn service 
+ps aux | grep gunicorn
+kill -9 <PID>
+
+# !!!!! Installing Nginx !!!!!!!!
+
+sudo apt-get update -y
+sudo apt-get install -y nginx
+
+# Modify & Create flask_app config file
+sudo nano /etc/nginx/sites-available/flask_app
+
+# crtl + X to leave and save nao Editor
+
+sudo ln -s /etc/nginx/sites-available/flask_app /etc/nginx/sites-enabled/
+
+
+## If you need to remove the flask_app from sites-endabled
+rm /etc/nginx/sites-enabled/flask_app
+
+# NGINX config
+server {
+    listen 80;
+    server_name Your_Ip_Address;
+
+    location / {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+
+

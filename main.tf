@@ -88,6 +88,7 @@ resource "aws_security_group" "ec2_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  
 
   # Allow all outbound traffic
   egress {
@@ -97,23 +98,28 @@ resource "aws_security_group" "ec2_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  #   # Allow Flask App Access
+  # ingress {
+  #   from_port   = 5000
+  #   to_port     = 5000
+  #   protocol    = "tcp"
+  #   cidr_blocks = ["0.0.0.0/0"]
+  # }
+
   tags = {
     Name = "MonoAppServer"
   }
 }
 
-
-
 resource "aws_instance" "app_server" {
   ami                    = "ami-091f18e98bc129c4e"
-  count                  = 1
   instance_type          = "t2.micro"
   key_name               = "Mono-Terraform-Key"
   subnet_id              = aws_subnet.public_subnet.id # Attach to a public subnet
   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
 
   tags = {
-    Name = "MonoAppServer-${count.index + 1}"
+    Name = "MonoAppServer"
   }
   user_data = file("app_script.sh")
   # user_data = <<-EOT
@@ -126,47 +132,9 @@ resource "aws_instance" "app_server" {
   # EOT
 }
 
-# resource "aws_instance" "nginx_server" {
-#   ami                    = "ami-091f18e98bc129c4e"
-#   instance_type          = "t2.micro"
-#   key_name               = "Mono-Terraform-Key"
-#   subnet_id              = aws_subnet.public_subnet.id # Attach to a public subnet
-#   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
-
-#   tags = {
-#     Name = "NginxServer"
-#   }
-#   user_data = file("lb_script.sh")
-#   # user_data = <<-EOT
-#   #   #!/bin/bash
-#   #   sudo yum update -y
-#   #   sudo yum install -y curl wget git vim htop
-#   #   sudo yum install -y httpd
-#   #   sudo systemctl enable httpd
-#   #   sudo systemctl start httpd
-#   # EOT
-# }
-
-
 
 output "app_server_IP_Address" {
   value = aws_instance.app_server[*].public_ip
 }
 
 
-# output "nginx_server_IP_Address" {
-#   value = aws_instance.nginx_server.public_ip
-# }
-
-# eval "$(ssh-agent -s)"
-# ssh-add ~/.ssh/Mono-Terraform-Key.pem
-
-
-#ssh -i "Mono-Terraform-Key.pem" ubuntu@35.177.54.163
-
-# 18.175.121.160
-# 18.132.194.101
-# 35.177.54.163
-
-# 10.0.1.121
-# 10.0.1.206
