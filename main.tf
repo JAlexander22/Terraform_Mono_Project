@@ -98,7 +98,7 @@ resource "aws_security_group" "ec2_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  #   # Allow Flask App Access
+  #   # Allow Flask App Access This is a test
   # ingress {
   #   from_port   = 5000
   #   to_port     = 5000
